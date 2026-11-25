@@ -255,6 +255,19 @@ export function formatAppError(
       return t("error.recovery_required", {
         transaction_id: error.transaction_id,
       });
+    case "duplicate_provider":
+      return t("error.duplicate_provider", { provider: providerLabel(error.provider, t) });
+    case "invalid_transaction_state":
+      return t("error.invalid_transaction_state", {
+        transaction_id: error.transaction_id,
+        status: statusLabel(error.status, t),
+      });
+    case "rollback_superseded":
+      return t("error.rollback_superseded", {
+        transaction_id: error.transaction_id,
+        newer_transaction_id: error.newer_transaction_id,
+        resources: error.resources.join(", "),
+      });
     case "verification_failed":
       return t("error.verification_failed", { resource: error.resource });
     case "rollback_incomplete":

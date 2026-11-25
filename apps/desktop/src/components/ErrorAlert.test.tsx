@@ -42,6 +42,18 @@ const SAMPLE_ERRORS = {
     ],
   },
   lock_unavailable: { code: "lock_unavailable" },
+  duplicate_provider: { code: "duplicate_provider", provider: "registry" },
+  invalid_transaction_state: {
+    code: "invalid_transaction_state",
+    transaction_id: "tx-done-01",
+    status: "rolled_back",
+  },
+  rollback_superseded: {
+    code: "rollback_superseded",
+    transaction_id: "tx-old-01",
+    newer_transaction_id: "tx-new-02",
+    resources: ["registry:hklm\\software\\x"],
+  },
   recovery_required: {
     code: "recovery_required",
     transaction_id: "tx-crashed-01",

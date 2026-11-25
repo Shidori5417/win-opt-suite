@@ -111,11 +111,21 @@ export type AntiCheatDriver =
 
 export type AppError = AppError_Serialize | AppError_Deserialize;
 
-export type AppError_Deserialize = { code: "access_denied"; resource: string } | { code: "not_found"; resource: string } | { code: "unsupported_platform"; reason: string } | { code: "provider_not_registered"; provider: ProviderKind } | { code: "action_provider_mismatch"; expected: ProviderKind; found: ProviderKind } | { code: "invalid_manifest"; id: string; issues: ManifestIssue[] } | { code: "conflict_blocked"; warnings: ConflictWarning_Deserialize[] } | { code: "lock_unavailable" } | { code: "recovery_required"; transaction_id: string } | { code: "verification_failed"; resource: string } | { code: "rollback_incomplete"; transaction_id: string; failed_resources: string[] } | { code: "storage"; message: string } | { code: "migration"; version: number; message: string } | { code: "serialization"; message: string } | { code: "io"; message: string } | 
+export type AppError_Deserialize = { code: "access_denied"; resource: string } | { code: "not_found"; resource: string } | { code: "unsupported_platform"; reason: string } | { code: "provider_not_registered"; provider: ProviderKind } | { code: "action_provider_mismatch"; expected: ProviderKind; found: ProviderKind } | { code: "invalid_manifest"; id: string; issues: ManifestIssue[] } | { code: "conflict_blocked"; warnings: ConflictWarning_Deserialize[] } | { code: "lock_unavailable" } | { code: "recovery_required"; transaction_id: string } | { code: "duplicate_provider"; provider: ProviderKind } | { code: "invalid_transaction_state"; transaction_id: string; status: TransactionStatus } | 
+/**
+ *  Rolling back would overwrite changes made by a newer committed
+ *  transaction to the same resources; roll back the newer one first.
+ */
+{ code: "rollback_superseded"; transaction_id: string; newer_transaction_id: string; resources: string[] } | { code: "verification_failed"; resource: string } | { code: "rollback_incomplete"; transaction_id: string; failed_resources: string[] } | { code: "storage"; message: string } | { code: "migration"; version: number; message: string } | { code: "serialization"; message: string } | { code: "io"; message: string } | 
 /**  Raw OS failure (Win32 error / HRESULT) not mapped to a specific variant. */
 { code: "os"; os_code: number; message: string } | { code: "internal"; message: string };
 
-export type AppError_Serialize = { code: "access_denied"; resource: string } | { code: "not_found"; resource: string } | { code: "unsupported_platform"; reason: string } | { code: "provider_not_registered"; provider: ProviderKind } | { code: "action_provider_mismatch"; expected: ProviderKind; found: ProviderKind } | { code: "invalid_manifest"; id: string; issues: ManifestIssue[] } | { code: "conflict_blocked"; warnings: ConflictWarning_Serialize[] } | { code: "lock_unavailable" } | { code: "recovery_required"; transaction_id: string } | { code: "verification_failed"; resource: string } | { code: "rollback_incomplete"; transaction_id: string; failed_resources: string[] } | { code: "storage"; message: string } | { code: "migration"; version: number; message: string } | { code: "serialization"; message: string } | { code: "io"; message: string } | 
+export type AppError_Serialize = { code: "access_denied"; resource: string } | { code: "not_found"; resource: string } | { code: "unsupported_platform"; reason: string } | { code: "provider_not_registered"; provider: ProviderKind } | { code: "action_provider_mismatch"; expected: ProviderKind; found: ProviderKind } | { code: "invalid_manifest"; id: string; issues: ManifestIssue[] } | { code: "conflict_blocked"; warnings: ConflictWarning_Serialize[] } | { code: "lock_unavailable" } | { code: "recovery_required"; transaction_id: string } | { code: "duplicate_provider"; provider: ProviderKind } | { code: "invalid_transaction_state"; transaction_id: string; status: TransactionStatus } | 
+/**
+ *  Rolling back would overwrite changes made by a newer committed
+ *  transaction to the same resources; roll back the newer one first.
+ */
+{ code: "rollback_superseded"; transaction_id: string; newer_transaction_id: string; resources: string[] } | { code: "verification_failed"; resource: string } | { code: "rollback_incomplete"; transaction_id: string; failed_resources: string[] } | { code: "storage"; message: string } | { code: "migration"; version: number; message: string } | { code: "serialization"; message: string } | { code: "io"; message: string } | 
 /**  Raw OS failure (Win32 error / HRESULT) not mapped to a specific variant. */
 { code: "os"; os_code: number; message: string } | { code: "internal"; message: string };
 
