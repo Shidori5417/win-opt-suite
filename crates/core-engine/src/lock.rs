@@ -1,25 +1,10 @@
-//! Global "one transaction at a time" lock.
+//! Portable file-based implementation of the `shared_types::TransactionLock`
+//! port (ADR-0004). The Win32 named mutex lives in `providers`.
 
 use std::fs::{File, OpenOptions, TryLockError};
 use std::path::{Path, PathBuf};
 
-use shared_types::{AppError, AppResult};
-
-/// Marker for a held lock; the lock is released when the guard is dropped.
-pub trait LockGuard: Send {}
-
-impl<T: Send> LockGuard for T {}
-
-/// Mutual exclusion between optimisation transactions (possibly across
-/// processes). A Win32 named-mutex implementation may be supplied later by
-/// the providers crate; [`FileLock`] is the portable default.
-pub trait TransactionLock: Send + Sync {
-    /// Acquires the lock without blocking.
-    ///
-    /// # Errors
-    /// [`AppError::LockUnavailable`] if another holder has it.
-    fn acquire(&self) -> AppResult<Box<dyn LockGuard>>;
-}
+use shared_types::{AppError, AppResult, LockGuard, TransactionLock};
 
 /// Cross-platform lock based on an exclusive advisory lock on a lock file
 /// (`std::fs::File::try_lock`).
