@@ -90,6 +90,35 @@ pub fn parse_smbios_chassis(raw: &[u8]) -> Vec<u16> {
     codes
 }
 
+/// Returns `true` when firmware identity strings (SMBIOS system manufacturer /
+/// product name) belong to a known hypervisor's virtual hardware.
+pub fn is_virtual_hardware(manufacturer: &str, product: &str) -> bool {
+    let m = manufacturer.to_ascii_lowercase();
+    let p = product.to_ascii_lowercase();
+    const MANUFACTURERS: &[&str] = &[
+        "vmware",
+        "innotek",
+        "qemu",
+        "xen",
+        "parallels",
+        "red hat",
+        "bochs",
+    ];
+    const PRODUCTS: &[&str] = &[
+        "virtualbox",
+        "vmware",
+        "kvm",
+        "qemu",
+        "hvm domu",
+        "parallels",
+        "bochs",
+    ];
+    MANUFACTURERS.iter().any(|v| m.contains(v))
+        || PRODUCTS.iter().any(|v| p.contains(v))
+        // Hyper-V guest: "Microsoft Corporation" + "Virtual Machine"
+        || (m.contains("microsoft") && p == "virtual machine")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -152,5 +181,25 @@ mod tests {
             parse_smbios_chassis(&wrap_rsmb(&[3, 6, 1, 0, 0, 14, b'A'])),
             vec![14]
         );
+    }
+
+    #[test]
+    fn virtual_hardware_detection() {
+        assert!(is_virtual_hardware("VMware, Inc.", "VMware20,1"));
+        assert!(is_virtual_hardware("innotek GmbH", "VirtualBox"));
+        assert!(is_virtual_hardware(
+            "QEMU",
+            "Standard PC (Q35 + ICH9, 2009)"
+        ));
+        assert!(is_virtual_hardware(
+            "Microsoft Corporation",
+            "Virtual Machine"
+        ));
+        assert!(!is_virtual_hardware(
+            "Microsoft Corporation",
+            "Surface Laptop 7"
+        ));
+        assert!(!is_virtual_hardware("ASUS", "ROG STRIX B650E-F"));
+        assert!(!is_virtual_hardware("", ""));
     }
 }

@@ -42,7 +42,9 @@ use crate::errors::{
     ERROR_FILE_NOT_FOUND, ERROR_INSUFFICIENT_BUFFER, ERROR_MORE_DATA, ERROR_PATH_NOT_FOUND,
     from_win32, internal,
 };
-use crate::smbios::parse_smbios_chassis;
+use crate::smbios::{is_virtual_hardware, parse_smbios_chassis};
+
+const BIOS_SUBKEY: &str = r"HARDWARE\DESCRIPTION\System\BIOS";
 
 const CURRENT_VERSION_SUBKEY: &str = r"SOFTWARE\Microsoft\Windows NT\CurrentVersion";
 const CPU_SUBKEY: &str = r"HARDWARE\DESCRIPTION\System\CentralProcessor\0";
@@ -527,7 +529,8 @@ impl ProbeSource for WindowsProbeSource {
         // BatteryFlag: 128 = no system battery, 255 = unknown status.
         let has_battery = status.BatteryFlag != 128 && status.BatteryFlag != 255;
         // ACLineStatus: 1 = online (AC), 0 = offline (battery), 255 = unknown.
-        let on_ac_power = status.ACLineStatus == 1;
+        // Unknown is treated as AC so we never claim "on battery" without proof.
+        let on_ac_power = status.ACLineStatus != 0;
         Ok(PowerStatus {
             has_battery,
             on_ac_power,
@@ -554,20 +557,14 @@ impl ProbeSource for WindowsProbeSource {
     }
 
     fn is_virtual_machine(&self) -> AppResult<bool> {
-        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
-        {
-            #[cfg(target_arch = "x86")]
-            use core::arch::x86::__cpuid;
-            #[cfg(target_arch = "x86_64")]
-            use core::arch::x86_64::__cpuid;
-
-            // CPUID.(EAX=1):ECX[31] is the Hypervisor Present bit.
-            Ok((__cpuid(1).ecx & (1 << 31)) != 0)
-        }
-        #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
-        {
-            Ok(false)
-        }
+        // The CPUID hypervisor-present bit is NOT used: on Windows 11 with
+        // VBS/HVCI (on by default) the host itself runs under Hyper-V and the
+        // bit is set on bare metal. Firmware identity strings are reliable.
+        let manufacturer =
+            reg_get_sz(HKEY_LOCAL_MACHINE, BIOS_SUBKEY, "SystemManufacturer")?.unwrap_or_default();
+        let product =
+            reg_get_sz(HKEY_LOCAL_MACHINE, BIOS_SUBKEY, "SystemProductName")?.unwrap_or_default();
+        Ok(is_virtual_hardware(&manufacturer, &product))
     }
 
     fn is_domain_joined(&self) -> AppResult<bool> {
