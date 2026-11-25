@@ -6,6 +6,7 @@
 
 mod com;
 mod firewall;
+mod lock;
 mod power;
 mod probe;
 mod registry;
@@ -13,6 +14,7 @@ mod service;
 mod task;
 
 pub use firewall::FirewallProvider;
+pub use lock::NamedMutexLock;
 pub use power::PowerPlanProvider;
 pub use probe::WindowsProbeSource;
 pub use registry::RegistryProvider;

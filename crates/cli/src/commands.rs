@@ -6,8 +6,12 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+#[cfg(not(windows))]
+use core_engine::FileLock;
 use core_engine::store::migrations::MIGRATIONS;
-use core_engine::{Catalog, DriftDetector, FileLock, ProviderRegistry, Store, TransactionManager};
+use core_engine::{
+    Catalog, DriftDetector, ProviderRegistry, Store, TransactionLock, TransactionManager,
+};
 use shared_types::{
     AppError, AppResult, MetricPhase, MetricSample, Profile, ProviderKind, SystemFacts,
     TransactionId, TransactionStatus, TweakId, TweakManifest,
@@ -454,6 +458,7 @@ fn open_store(db_path: &Path) -> AppResult<Store> {
     Store::open(db_path)
 }
 
+#[cfg(not(windows))]
 fn lock_path_for_db(db_path: &Path) -> PathBuf {
     let mut os = db_path.as_os_str().to_os_string();
     os.push(".lock");
@@ -463,7 +468,10 @@ fn lock_path_for_db(db_path: &Path) -> PathBuf {
 fn open_manager(db_path: &Path) -> AppResult<TransactionManager> {
     let store = open_store(db_path)?;
     let registry = build_registry()?;
-    let lock = Box::new(FileLock::new(lock_path_for_db(db_path)));
+    #[cfg(windows)]
+    let lock: Box<dyn TransactionLock> = Box::new(providers::NamedMutexLock::new());
+    #[cfg(not(windows))]
+    let lock: Box<dyn TransactionLock> = Box::new(FileLock::new(lock_path_for_db(db_path)));
     Ok(TransactionManager::new(store, registry, lock))
 }
 

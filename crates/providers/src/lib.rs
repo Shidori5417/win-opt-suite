@@ -32,8 +32,8 @@ mod win;
 
 #[cfg(windows)]
 pub use win::{
-    FirewallProvider, PowerPlanProvider, RegistryProvider, ScheduledTaskProvider, ServiceProvider,
-    WindowsProbeSource,
+    FirewallProvider, NamedMutexLock, PowerPlanProvider, RegistryProvider, ScheduledTaskProvider,
+    ServiceProvider, WindowsProbeSource,
 };
 
 use shared_types::SystemProvider;
