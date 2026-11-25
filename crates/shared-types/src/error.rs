@@ -7,6 +7,7 @@ use thiserror::Error;
 use crate::action::ProviderKind;
 use crate::conflict::ConflictWarning;
 use crate::manifest::ManifestIssue;
+use crate::transaction::TransactionStatus;
 
 pub type AppResult<T> = Result<T, AppError>;
 
@@ -47,6 +48,26 @@ pub enum AppError {
 
     #[error("incomplete transaction `{transaction_id}` must be recovered first")]
     RecoveryRequired { transaction_id: String },
+
+    #[error("provider `{provider}` is already registered")]
+    DuplicateProvider { provider: ProviderKind },
+
+    #[error("transaction `{transaction_id}` is {status}, which does not allow this operation")]
+    InvalidTransactionState {
+        transaction_id: String,
+        status: TransactionStatus,
+    },
+
+    /// Rolling back would overwrite changes made by a newer committed
+    /// transaction to the same resources; roll back the newer one first.
+    #[error(
+        "transaction `{transaction_id}` is superseded by `{newer_transaction_id}` on {resources:?}"
+    )]
+    RollbackSuperseded {
+        transaction_id: String,
+        newer_transaction_id: String,
+        resources: Vec<String>,
+    },
 
     #[error("verification failed for {resource}")]
     VerificationFailed { resource: String },
