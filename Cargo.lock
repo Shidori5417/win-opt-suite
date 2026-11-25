@@ -55,6 +55,7 @@ dependencies = [
  "serde_json",
  "sha2",
  "shared-types",
+ "toml",
  "uuid",
 ]
 

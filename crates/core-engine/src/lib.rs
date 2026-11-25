@@ -12,6 +12,7 @@
 //! * `manager`: `TransactionManager` (saga apply, rollback, crash recovery).
 #![forbid(unsafe_code)]
 
+pub mod catalog;
 pub mod clock;
 pub mod conflict;
 pub mod lock;
@@ -23,6 +24,7 @@ pub mod store;
 #[cfg(test)]
 mod testing;
 
+pub use catalog::Catalog;
 pub use clock::{Clock, IdGenerator, SystemClock, UuidV7Generator};
 pub use conflict::ConflictGuard;
 pub use lock::{FileLock, LockGuard, TransactionLock};
