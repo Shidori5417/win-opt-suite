@@ -6,6 +6,7 @@ members = [
     "crates/providers",
     "crates/system-probe",
     "crates/cli",
+    "apps/desktop/src-tauri",
 ]
 
 [workspace.package]
