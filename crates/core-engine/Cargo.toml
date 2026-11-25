@@ -10,6 +10,11 @@ publish.workspace = true
 # KURAL: Yalnızca shared-types'a bağımlıdır; Win32/COM API'lerini import edemez.
 [dependencies]
 shared-types.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+rusqlite.workspace = true
+sha2.workspace = true
+uuid.workspace = true
 
 [lints]
 workspace = true
