@@ -6,9 +6,11 @@ use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+#[cfg(not(windows))]
+use core_engine::FileLock;
 use core_engine::store::migrations::MIGRATIONS;
 use core_engine::{
-    Catalog, DriftDetector, FileLock, ProviderRegistry, Store, TransactionLock, TransactionManager,
+    Catalog, DriftDetector, ProviderRegistry, Store, TransactionLock, TransactionManager,
 };
 use shared_types::{
     AppError, AppResult, MetricPhase, MetricSample, Profile, ProviderKind, SystemFacts,
@@ -456,6 +458,7 @@ fn open_store(db_path: &Path) -> AppResult<Store> {
     Store::open(db_path)
 }
 
+#[cfg(not(windows))]
 fn lock_path_for_db(db_path: &Path) -> PathBuf {
     let mut os = db_path.as_os_str().to_os_string();
     os.push(".lock");
