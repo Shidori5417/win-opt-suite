@@ -16,6 +16,7 @@ pub mod error;
 pub mod ids;
 pub mod manifest;
 pub mod policy;
+pub mod probe;
 pub mod provider;
 pub mod snapshot;
 pub mod system;
@@ -34,6 +35,7 @@ pub use manifest::{
     CURRENT_MANIFEST_SCHEMA_VERSION, EnvironmentTag, ManifestIssue, Profile, RiskLevel,
     TweakCategory, TweakManifest, WINDOWS_11_MIN_BUILD,
 };
+pub use probe::{MemoryStatus, OsVersionInfo, PowerStatus, ProbeSource};
 pub use provider::SystemProvider;
 pub use snapshot::{StateSnapshot, VerifyOutcome};
 pub use system::{
