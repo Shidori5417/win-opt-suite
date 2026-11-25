@@ -26,13 +26,34 @@ pub mod mapping;
 pub mod paths;
 pub mod reg_codec;
 
+#[cfg(windows)]
+mod win;
+
+#[cfg(windows)]
+pub use win::{
+    FirewallProvider, PowerPlanProvider, RegistryProvider, ScheduledTaskProvider, ServiceProvider,
+};
+
 use shared_types::SystemProvider;
 
 /// All native providers available on this platform: the five Windows
 /// adapters (registry, service, scheduled task, power plan, firewall) on
 /// Windows, an empty list elsewhere.
 pub fn native_providers() -> Vec<Box<dyn SystemProvider>> {
-    Vec::new()
+    #[cfg(windows)]
+    {
+        vec![
+            Box::new(RegistryProvider::new()),
+            Box::new(ServiceProvider::new()),
+            Box::new(ScheduledTaskProvider::new()),
+            Box::new(PowerPlanProvider::new()),
+            Box::new(FirewallProvider::new()),
+        ]
+    }
+    #[cfg(not(windows))]
+    {
+        Vec::new()
+    }
 }
 
 #[cfg(test)]
