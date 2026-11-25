@@ -126,6 +126,12 @@ pub enum ManifestIssue {
     DuplicateResource { resource: String },
     #[error("action #{index}: forbidden target ({reason})")]
     ForbiddenTarget { index: usize, reason: String },
+    #[error("file could not be parsed: {message}")]
+    Unparseable { message: String },
+    #[error("tweak id is defined more than once in the catalog")]
+    DuplicateId,
+    #[error("conflicts_with references unknown tweak `{other}`")]
+    UnknownConflictReference { other: String },
 }
 
 impl TweakManifest {
