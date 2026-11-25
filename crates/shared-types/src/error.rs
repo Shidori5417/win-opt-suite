@@ -11,6 +11,7 @@ use crate::manifest::ManifestIssue;
 pub type AppResult<T> = Result<T, AppError>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "code", rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum AppError {

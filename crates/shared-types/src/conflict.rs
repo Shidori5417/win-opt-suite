@@ -8,6 +8,7 @@ use crate::ids::{ResourceId, TweakId};
 use crate::manifest::EnvironmentTag;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 pub enum Severity {
     Info,
@@ -19,6 +20,7 @@ pub enum Severity {
 /// Structured conflict reason. The UI localises it by `kind`; `Display` is an
 /// English fallback for logs and the CLI.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "kind", rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum ConflictKind {
@@ -41,6 +43,7 @@ pub enum ConflictKind {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct ConflictWarning {
     pub severity: Severity,
     pub kind: ConflictKind,

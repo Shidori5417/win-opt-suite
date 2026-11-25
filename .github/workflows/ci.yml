@@ -28,6 +28,11 @@ jobs:
       - uses: actions-rust-lang/setup-rust-toolchain@v1 # rust-toolchain.toml'u okur
         with:
           components: rustfmt, clippy
+      - name: Linux Tauri system deps
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -yq libwebkit2gtk-4.1-dev libgtk-3-dev libsoup-3.0-dev librsvg2-dev libayatana-appindicator3-dev
       - name: Format
         run: cargo fmt --all -- --check
       - name: Clippy

@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 /// validation (deserialization itself is lenient so that all issues can be
 /// reported at once).
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(transparent)]
 pub struct TweakId(String);
 
@@ -62,6 +63,7 @@ impl fmt::Display for TweakId {
 /// Identifier of an apply/rollback transaction (opaque string; the engine
 /// decides the generation scheme, e.g. UUIDv7).
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(transparent)]
 pub struct TransactionId(String);
 
@@ -88,6 +90,7 @@ impl fmt::Display for TransactionId {
 /// (used by the conflict guard and the drift detector). Produced only by
 /// [`crate::ActionSpec::resource_id`].
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(transparent)]
 pub struct ResourceId(String);
 

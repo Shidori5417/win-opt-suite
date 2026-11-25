@@ -19,6 +19,7 @@ use crate::manifest::Profile;
 /// `Pending`, `Applying` and `RollingBack` found at startup mean the process
 /// died mid-transaction: startup crash recovery must run.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 pub enum TransactionStatus {
     Pending,
@@ -75,6 +76,7 @@ impl fmt::Display for TransactionStatus {
 /// Per-action step state. A step is written `PENDING` (with its snapshot)
 /// *before* the provider touches the system and `APPLIED` right after.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 pub enum StepStatus {
     Pending,
@@ -113,6 +115,7 @@ impl fmt::Display for StepStatus {
 
 /// History row for the rollback screen / CLI.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct TransactionSummary {
     pub id: TransactionId,
     pub created_at_unix_ms: i64,

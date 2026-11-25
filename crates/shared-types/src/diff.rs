@@ -7,6 +7,7 @@ use crate::conflict::{ConflictWarning, Severity};
 use crate::ids::{ResourceId, TweakId};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 pub enum ChangeKind {
     Create,
@@ -29,6 +30,7 @@ impl ChangeKind {
 
 /// One `old -> new` row of the dry-run diff.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct DiffEntry {
     pub tweak_id: TweakId,
     pub provider: ProviderKind,
@@ -60,6 +62,7 @@ impl DiffEntry {
 
 /// Complete plan for applying a set of tweaks. Producing it never modifies the system.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct DryRunDiff {
     pub entries: Vec<DiffEntry>,
     pub warnings: Vec<ConflictWarning>,

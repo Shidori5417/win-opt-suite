@@ -9,6 +9,7 @@ use crate::error::AppResult;
 use crate::system::{CpuInfo, GpuInfo};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct OsVersionInfo {
     pub build: u32,
     pub ubr: u32,
@@ -19,12 +20,14 @@ pub struct OsVersionInfo {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct MemoryStatus {
     pub total_bytes: u64,
     pub available_bytes: u64,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct PowerStatus {
     pub has_battery: bool,
     pub on_ac_power: bool,

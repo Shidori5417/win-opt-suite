@@ -11,6 +11,11 @@ publish.workspace = true
 [dependencies]
 serde.workspace = true
 thiserror.workspace = true
+specta = { workspace = true, optional = true }
+
+[features]
+# Derives `specta::Type` on every IPC-visible type (used by apps/desktop, ADR-0003).
+specta = ["dep:specta"]
 
 [dev-dependencies]
 serde_json.workspace = true
