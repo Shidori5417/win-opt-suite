@@ -25,6 +25,7 @@ pub mod guid;
 pub mod mapping;
 pub mod paths;
 pub mod reg_codec;
+pub mod smbios;
 
 #[cfg(windows)]
 mod win;
@@ -32,6 +33,7 @@ mod win;
 #[cfg(windows)]
 pub use win::{
     FirewallProvider, PowerPlanProvider, RegistryProvider, ScheduledTaskProvider, ServiceProvider,
+    WindowsProbeSource,
 };
 
 use shared_types::SystemProvider;

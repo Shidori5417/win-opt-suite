@@ -14,11 +14,17 @@ shared-types.workspace = true
 [target.'cfg(windows)'.dependencies]
 windows = { workspace = true, features = [
     "Win32_Foundation",
+    "Win32_Graphics_Dxgi",
+    "Win32_Graphics_Dxgi_Common",
+    "Win32_NetworkManagement_NetManagement",
     "Win32_Security",
     "Win32_System_Com",
+    "Win32_System_Diagnostics_ToolHelp",
     "Win32_System_Power",
+    "Win32_System_ProcessStatus",
     "Win32_System_Registry",
     "Win32_System_Services",
+    "Win32_System_SystemInformation",
     "Win32_System_TaskScheduler",
     "Win32_System_Variant",
     "Win32_System_Ole",
