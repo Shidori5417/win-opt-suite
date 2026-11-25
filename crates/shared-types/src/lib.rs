@@ -12,6 +12,7 @@
 pub mod action;
 pub mod conflict;
 pub mod diff;
+pub mod drift;
 pub mod error;
 pub mod ids;
 pub mod manifest;
@@ -29,6 +30,7 @@ pub use action::{
 };
 pub use conflict::{ConflictKind, ConflictWarning, Severity};
 pub use diff::{ChangeKind, DiffEntry, DryRunDiff};
+pub use drift::{DriftCheckError, DriftEntry, DriftReport};
 pub use error::{AppError, AppResult};
 pub use ids::{ResourceId, TransactionId, TweakId};
 pub use manifest::{
