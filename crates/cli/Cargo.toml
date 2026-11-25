@@ -10,6 +10,12 @@ publish.workspace = true
 # KURAL: Yalnızca orkestrasyon; doğrudan sistem çağrısı yapamaz.
 [dependencies]
 shared-types.workspace = true
+core-engine = { path = "../core-engine" }
+providers = { path = "../providers" }
+system-probe = { path = "../system-probe" }
+serde.workspace = true
+serde_json.workspace = true
+clap.workspace = true
 
 [lints]
 workspace = true

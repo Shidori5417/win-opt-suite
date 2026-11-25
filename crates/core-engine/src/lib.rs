@@ -15,6 +15,7 @@
 pub mod catalog;
 pub mod clock;
 pub mod conflict;
+pub mod drift;
 pub mod lock;
 pub mod manager;
 pub mod planner;
@@ -27,6 +28,7 @@ mod testing;
 pub use catalog::Catalog;
 pub use clock::{Clock, IdGenerator, SystemClock, UuidV7Generator};
 pub use conflict::ConflictGuard;
+pub use drift::DriftDetector;
 pub use lock::{FileLock, LockGuard, TransactionLock};
 pub use manager::TransactionManager;
 pub use planner::DryRunPlanner;

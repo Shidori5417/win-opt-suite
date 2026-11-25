@@ -28,6 +28,7 @@ rusqlite = { version = "0.37", features = ["bundled"] }
 sha2 = "0.10"
 uuid = { version = "1", features = ["v7"] }
 windows = "0.62"
+clap = { version = "4", features = ["derive"] }
 
 [workspace.lints.rust]
 unsafe_code = "deny"            # Yalnızca crates/providers yerel olarak gevşetir.
