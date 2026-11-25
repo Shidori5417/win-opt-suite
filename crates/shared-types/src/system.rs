@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::manifest::EnvironmentTag;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum AntiCheatDriver {
@@ -31,6 +32,7 @@ impl AntiCheatDriver {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct CpuInfo {
     pub brand: String,
     pub physical_cores: u32,
@@ -38,6 +40,7 @@ pub struct CpuInfo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct GpuInfo {
     pub name: String,
     /// PCI vendor id (e.g. 0x10DE NVIDIA, 0x1002 AMD, 0x8086 Intel).
@@ -47,6 +50,7 @@ pub struct GpuInfo {
 
 /// Snapshot of the machine the tool is running on.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct SystemFacts {
     pub windows_build: u32,
     /// Update Build Revision (the `.xxxx` part of e.g. `26100.2605`).
@@ -87,6 +91,7 @@ impl SystemFacts {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum MetricKind {
@@ -107,6 +112,7 @@ impl MetricKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 pub enum MetricPhase {
     Before,
@@ -123,6 +129,7 @@ impl MetricPhase {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct MetricSample {
     pub kind: MetricKind,
     pub phase: MetricPhase,

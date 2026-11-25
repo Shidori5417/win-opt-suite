@@ -13,6 +13,7 @@ use crate::ids::ResourceId;
 /// `ProviderRegistry`) is the *only* change needed to support a new subsystem;
 /// the transaction manager stays untouched. Requires an ADR.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum ProviderKind {
@@ -66,6 +67,7 @@ impl fmt::Display for ProviderKind {
 /// value = { type = "dword", data = 0 }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "provider", rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum ActionSpec {
@@ -168,6 +170,7 @@ impl ActionSpec {
 // ---------------------------------------------------------------- Registry --
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[non_exhaustive]
 pub enum RegistryHive {
     #[serde(rename = "HKLM")]
@@ -187,6 +190,7 @@ impl RegistryHive {
 
 /// Typed registry value. Serialized as `{ type = "dword", data = 0 }`.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "type", content = "data", rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum RegistryValue {
@@ -201,6 +205,7 @@ pub enum RegistryValue {
 /// Set (`value = ...`) or delete (`delete = true`) a single registry value.
 /// Exactly one of the two must be given; enforced by manifest validation.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(deny_unknown_fields)]
 pub struct RegistryAction {
     pub hive: RegistryHive,
@@ -217,6 +222,7 @@ pub struct RegistryAction {
 // ----------------------------------------------------------------- Service --
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum ServiceStartType {
@@ -227,6 +233,7 @@ pub enum ServiceStartType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(deny_unknown_fields)]
 pub struct ServiceAction {
     /// Service key name (not the display name), e.g. `DiagTrack`.
@@ -237,6 +244,7 @@ pub struct ServiceAction {
 // ---------------------------------------------------------- Scheduled task --
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(deny_unknown_fields)]
 pub struct ScheduledTaskAction {
     /// Full task path, e.g. `\Microsoft\Windows\Application Experience\ProgramDataUpdater`.
@@ -248,6 +256,7 @@ pub struct ScheduledTaskAction {
 
 /// Power plan changes. GUIDs are lowercase `8-4-4-4-12` hex without braces.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 #[non_exhaustive]
 pub enum PowerPlanAction {
@@ -268,6 +277,7 @@ pub enum PowerPlanAction {
 // ---------------------------------------------------------------- Firewall --
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 pub enum FirewallDirection {
     Inbound,
@@ -275,6 +285,7 @@ pub enum FirewallDirection {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 pub enum FirewallRuleAction {
     Allow,
@@ -282,6 +293,7 @@ pub enum FirewallRuleAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(deny_unknown_fields)]
 pub struct FirewallRule {
     /// Unique rule name; resources owned by this app use the `WinOptSuite-` prefix.
@@ -296,6 +308,7 @@ pub struct FirewallRule {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "op", rename_all = "snake_case", deny_unknown_fields)]
 #[non_exhaustive]
 pub enum FirewallAction {
@@ -308,6 +321,7 @@ pub enum FirewallAction {
 /// Observed (or desired) state of one resource. Absence is modelled as
 /// `Option<ResourceState>::None` by the containing type.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "kind", rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum ResourceState {

@@ -17,6 +17,7 @@ pub const CURRENT_MANIFEST_SCHEMA_VERSION: u32 = 1;
 pub const WINDOWS_11_MIN_BUILD: u32 = 22000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum TweakCategory {
@@ -33,6 +34,7 @@ pub enum TweakCategory {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 pub enum RiskLevel {
     Low,
@@ -42,6 +44,7 @@ pub enum RiskLevel {
 
 /// Environment facts a tweak can be excluded on (see [`crate::SystemFacts::environment_tags`]).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum EnvironmentTag {
@@ -58,6 +61,7 @@ pub enum EnvironmentTag {
 
 /// Curated profile a tweak belongs to.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum Profile {
@@ -70,6 +74,7 @@ pub enum Profile {
 /// One declarative tweak. Unknown fields are rejected so that typos in TOML
 /// never silently disable a safety property.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(deny_unknown_fields)]
 pub struct TweakManifest {
     pub schema_version: u32,
@@ -99,6 +104,7 @@ pub struct TweakManifest {
 
 /// A single validation problem in a manifest.
 #[derive(Debug, Clone, PartialEq, Eq, Error, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "issue", rename_all = "snake_case")]
 #[non_exhaustive]
 pub enum ManifestIssue {

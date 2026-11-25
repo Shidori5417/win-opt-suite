@@ -11,6 +11,7 @@ use crate::ids::ResourceId;
 ///
 /// Invariant: `existed == state.is_some()`. Use the constructors.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 pub struct StateSnapshot {
     pub resource: ResourceId,
     pub provider: ProviderKind,
@@ -59,6 +60,7 @@ impl StateSnapshot {
 
 /// Result of comparing the live system with an action's desired state.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[cfg_attr(feature = "specta", derive(specta::Type))]
 #[serde(tag = "outcome", rename_all = "snake_case")]
 pub enum VerifyOutcome {
     Matches,
