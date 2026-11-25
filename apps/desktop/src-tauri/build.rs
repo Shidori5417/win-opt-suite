@@ -1,35 +1,31 @@
-//! Tauri v2 build script with a Windows application manifest requesting
-//! administrator elevation (required for HKLM registry, service, scheduled
-//! task, power plan, and firewall modifications) while preserving Common
-//! Controls v6.
+//! Tauri v2 build script.
+//!
+//! The Windows application manifest (administrator elevation for HKLM,
+//! service, task, power and firewall writes + Common Controls v6) is embedded
+//! with the MSVC linker into EVERY target, not via tauri-build's resource.
+//! tauri-build only embeds it into the binary, so the unit-test executable
+//! would lack the Common Controls v6 dependency and fail to start with
+//! `STATUS_ENTRYPOINT_NOT_FOUND` (TaskDialogIndirect). This is the approach
+//! documented by Tauri for crates with tests.
 
-const WINDOWS_APP_MANIFEST: &str = r#"
-<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <dependency>
-    <dependentAssembly>
-      <assemblyIdentity
-        type="win32"
-        name="Microsoft.Windows.Common-Controls"
-        version="6.0.0.0"
-        processorArchitecture="*"
-        publicKeyToken="6595b64144ccf1df"
-        language="*"
-      />
-    </dependentAssembly>
-  </dependency>
-  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
-    <security>
-      <requestedPrivileges>
-        <requestedExecutionLevel level="requireAdministrator" uiAccess="false" />
-      </requestedPrivileges>
-    </security>
-  </trustInfo>
-</assembly>
-"#;
+use std::path::Path;
+
+const WINDOWS_APP_MANIFEST: &str = "windows-app-manifest.xml";
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let windows = tauri_build::WindowsAttributes::new().app_manifest(WINDOWS_APP_MANIFEST);
+    let windows = tauri_build::WindowsAttributes::new_without_app_manifest();
     let attributes = tauri_build::Attributes::new().windows_attributes(windows);
     tauri_build::try_build(attributes)?;
+
+    let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    let target_env = std::env::var("CARGO_CFG_TARGET_ENV").unwrap_or_default();
+    if target_os == "windows" && target_env == "msvc" {
+        let manifest = Path::new(env!("CARGO_MANIFEST_DIR")).join(WINDOWS_APP_MANIFEST);
+        println!("cargo:rerun-if-changed={}", manifest.display());
+        println!("cargo:rustc-link-arg=/MANIFEST:EMBED");
+        println!("cargo:rustc-link-arg=/MANIFESTINPUT:{}", manifest.display());
+        // Turn linker warnings (e.g. duplicate manifests) into errors.
+        println!("cargo:rustc-link-arg=/WX");
+    }
     Ok(())
 }
