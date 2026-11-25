@@ -1,0 +1,17 @@
+schema_version = 1
+id = "privacy.disable-input-personalization"
+title = "Disable input personalization"
+description = "Turns off collection of typing and inking data used for personalization through the AllowInputPersonalization policy."
+category = "privacy"
+risk = "low"
+side_effects = "Online speech recognition and typing personalization (suggestions learned from your typing) are turned off."
+min_windows_build = 22000
+profiles = ["privacy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-inputpersonalization#allowinputpersonalization"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\InputPersonalization'
+value_name = "AllowInputPersonalization"
+value = { type = "dword", data = 0 }

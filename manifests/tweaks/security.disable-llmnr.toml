@@ -1,0 +1,17 @@
+schema_version = 1
+id = "security.disable-llmnr"
+title = "Disable LLMNR multicast name resolution"
+description = "Sets the EnableMulticast policy to 0 to turn off Link-Local Multicast Name Resolution."
+category = "security"
+risk = "low"
+side_effects = "Name resolution for some local devices without DNS (via LLMNR) stops working."
+min_windows_build = 22000
+excluded_on = ["domain_joined"]
+profiles = ["safe", "privacy"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows NT\DNSClient'
+value_name = "EnableMulticast"
+value = { type = "dword", data = 0 }

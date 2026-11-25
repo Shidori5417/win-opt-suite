@@ -1,0 +1,17 @@
+schema_version = 1
+id = "privacy.disable-recall-snapshots"
+title = "Disable Recall snapshots"
+description = "Sets the DisableAIDataAnalysis policy so Recall does not save snapshots of the screen."
+category = "privacy"
+risk = "low"
+side_effects = "Recall no longer saves snapshots. Applies to Copilot+ PCs with Recall; no effect on other PCs."
+min_windows_build = 26100
+profiles = ["safe", "privacy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-windowsai#disableaidataanalysis"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\WindowsAI'
+value_name = "DisableAIDataAnalysis"
+value = { type = "dword", data = 1 }

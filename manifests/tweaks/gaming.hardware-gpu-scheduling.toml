@@ -1,0 +1,19 @@
+schema_version = 1
+id = "gaming.hardware-gpu-scheduling"
+title = "Enable hardware-accelerated GPU scheduling"
+description = "Sets HwSchMode to 2 to turn on hardware-accelerated GPU scheduling. A reboot is required."
+category = "gaming"
+risk = "medium"
+side_effects = "Requires a WDDM 2.7+ GPU and driver. The benefit varies by GPU and may change frame pacing. A reboot is required."
+min_windows_build = 22000
+excluded_on = ["virtual_machine"]
+requires_reboot = true
+profiles = ["gaming"]
+references = ["https://learn.microsoft.com/windows-hardware/drivers/display/hardware-accelerated-gpu-scheduling"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SYSTEM\CurrentControlSet\Control\GraphicsDrivers'
+value_name = "HwSchMode"
+value = { type = "dword", data = 2 }

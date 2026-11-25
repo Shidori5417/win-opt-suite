@@ -1,0 +1,25 @@
+[package]
+name = "cli"
+description = "opti-cli: ince headless CLI kabuğu (iş mantığı içermez)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# KURAL: Yalnızca orkestrasyon; doğrudan sistem çağrısı yapamaz.
+[dependencies]
+shared-types.workspace = true
+core-engine = { path = "../core-engine" }
+providers = { path = "../providers" }
+system-probe = { path = "../system-probe" }
+serde.workspace = true
+serde_json.workspace = true
+clap.workspace = true
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "opti-cli"
+path = "src/main.rs"

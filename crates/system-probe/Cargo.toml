@@ -1,0 +1,15 @@
+[package]
+name = "system-probe"
+description = "Salt-okunur sistem probu: OS build, donanım, pil, anti-cheat sürücüleri, metrikler."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# KURAL: Yalnızca shared-types + salt-okunur sistem sorguları; sistemi DEĞİŞTİREMEZ.
+[dependencies]
+shared-types.workspace = true
+
+[lints]
+workspace = true

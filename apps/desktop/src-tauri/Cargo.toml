@@ -1,0 +1,40 @@
+[package]
+name = "desktop"
+description = "WinOptSuite Tauri v2 masaüstü kabuğu (iş mantığı içermez; yalnızca IPC orkestrasyonu)."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+name = "desktop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "winoptsuite"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build.workspace = true
+
+# KURAL: Yalnızca orkestrasyon; doğrudan sistem çağrısı veya unsafe içeremez (ADR-0001, ADR-0003).
+[dependencies]
+shared-types = { workspace = true, features = ["specta"] }
+core-engine = { path = "../../../crates/core-engine" }
+providers = { path = "../../../crates/providers" }
+serde.workspace = true
+specta.workspace = true
+specta-typescript.workspace = true
+tauri.workspace = true
+tauri-specta.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+system-probe = { path = "../../../crates/system-probe" }
+
+[features]
+# Production builds use the embedded frontend assets instead of Vite's dev server.
+custom-protocol = ["tauri/custom-protocol"]
+
+[lints]
+workspace = true

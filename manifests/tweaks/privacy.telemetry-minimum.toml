@@ -1,0 +1,18 @@
+schema_version = 1
+id = "privacy.telemetry-minimum"
+title = "Limit diagnostic data to the minimum level"
+description = "Sets the AllowTelemetry policy to 0 (Security), the lowest level Windows honours. Home and Pro editions treat it as Required (1)."
+category = "privacy"
+risk = "low"
+side_effects = "On Home and Pro the effective level becomes Required (1), not Security. Windows Insider builds and some feedback features stop working."
+min_windows_build = 22000
+excluded_on = ["domain_joined"]
+profiles = ["safe", "privacy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-system#allowtelemetry"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\DataCollection'
+value_name = "AllowTelemetry"
+value = { type = "dword", data = 0 }
