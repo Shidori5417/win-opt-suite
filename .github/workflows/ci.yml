@@ -87,15 +87,26 @@ jobs:
   frontend:
     name: Desktop frontend (TS strict)
     runs-on: windows-latest
-    if: ${{ hashFiles('apps/desktop/package.json') != '' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - name: Detect frontend
+        id: detect
+        shell: bash
+        run: |
+          if [ -f apps/desktop/package.json ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.detect.outputs.present == 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          package_json_file: apps/desktop/package.json
+      - if: steps.detect.outputs.present == 'true'
+        uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
           cache-dependency-path: apps/desktop/pnpm-lock.yaml
-      - run: pnpm --dir apps/desktop install --frozen-lockfile
-      - run: pnpm --dir apps/desktop typecheck
-      - run: pnpm --dir apps/desktop build
+      - if: steps.detect.outputs.present == 'true'
+        run: pnpm --dir apps/desktop install --frozen-lockfile
+      - if: steps.detect.outputs.present == 'true'
+        run: pnpm --dir apps/desktop typecheck
+      - if: steps.detect.outputs.present == 'true'
+        run: pnpm --dir apps/desktop build
