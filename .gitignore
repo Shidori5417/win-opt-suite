@@ -27,3 +27,6 @@ apps/desktop/src-tauri/gen/
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
+
+# Ajan worktree/yerel ayarları
+.claude/
