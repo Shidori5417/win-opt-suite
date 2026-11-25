@@ -39,6 +39,8 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test
         run: cargo test --workspace
+      - name: Verify IPC TypeScript bindings freshness
+        run: git diff --exit-code apps/desktop/src/bindings.ts
       - name: opti-cli smoke (read-only)
         if: runner.os == 'Windows'
         shell: bash
