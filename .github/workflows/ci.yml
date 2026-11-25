@@ -86,6 +86,15 @@ jobs:
             echo "::error::Published migrations modified: $changed"; exit 1
           fi
 
+  deny:
+    name: Dependency audit (cargo-deny)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories bans licenses sources
+
   manifests:
     name: Manifest schema validation
     runs-on: ubuntu-latest
