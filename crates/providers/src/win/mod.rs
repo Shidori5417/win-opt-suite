@@ -7,12 +7,14 @@
 mod com;
 mod firewall;
 mod power;
+mod probe;
 mod registry;
 mod service;
 mod task;
 
 pub use firewall::FirewallProvider;
 pub use power::PowerPlanProvider;
+pub use probe::WindowsProbeSource;
 pub use registry::RegistryProvider;
 pub use service::ServiceProvider;
 pub use task::ScheduledTaskProvider;
