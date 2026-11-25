@@ -1,0 +1,101 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, "feat/**", "fix/**", "refactor/**", "chore/**", "docs/**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  rust:
+    name: Rust (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # Windows: hedef platform. Ubuntu: core-engine/shared-types'ın
+        # platformdan bağımsız kaldığını zorlar (ADR-0001).
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1 # rust-toolchain.toml'u okur
+        with:
+          components: rustfmt, clippy
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Test
+        run: cargo test --workspace
+
+  policy:
+    name: Repository policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Forbid external shell processes
+        shell: bash
+        run: |
+          if grep -rniE '(powershell(\.exe)?|cmd\.exe|"cmd"|reg\.exe|sc\.exe)' --include='*.rs' crates apps 2>/dev/null \
+             | grep -vE '^[^:]+:[0-9]+:\s*//' ; then
+            echo "::error::External shell invocation found (AGENTS.md §2)"; exit 1
+          fi
+      - name: unsafe only in crates/providers
+        shell: bash
+        run: |
+          if grep -rn 'unsafe' --include='*.rs' crates apps 2>/dev/null \
+             | grep -v '^crates/providers/' | grep -vE 'unsafe_code|//' ; then
+            echo "::error::unsafe outside crates/providers"; exit 1
+          fi
+      - name: Published migrations are immutable
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
+          changed=$(git diff --name-only --diff-filter=MDR "origin/${{ github.base_ref }}"...HEAD -- migrations/ || true)
+          if [ -n "$changed" ]; then
+            echo "::error::Published migrations modified: $changed"; exit 1
+          fi
+
+  manifests:
+    name: Manifest schema validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Validate manifests/tweaks/*.toml against manifests/schema.json
+        shell: bash
+        run: |
+          if [ ! -f manifests/schema.json ]; then
+            echo "schema.json not present yet (Phase 2) — skipping"; exit 0
+          fi
+          pip install --quiet check-jsonschema==0.33.0
+          shopt -s nullglob
+          files=(manifests/tweaks/*.toml)
+          [ ${#files[@]} -eq 0 ] && { echo "no manifests"; exit 0; }
+          check-jsonschema --schemafile manifests/schema.json "${files[@]}"
+
+  frontend:
+    name: Desktop frontend (TS strict)
+    runs-on: windows-latest
+    if: ${{ hashFiles('apps/desktop/package.json') != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: apps/desktop/pnpm-lock.yaml
+      - run: pnpm --dir apps/desktop install --frozen-lockfile
+      - run: pnpm --dir apps/desktop typecheck
+      - run: pnpm --dir apps/desktop build
