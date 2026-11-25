@@ -14,7 +14,9 @@ Bu dosya proje kökünde kalıcı olarak yer alır. Projede çalışan **Ana Aja
 | `neon` | **Tauri v2 & Frontend Uzmanı** | `apps/desktop` (Tauri IPC + React/TS arayüzü) |
 | `claude-haiku` | **Paralel Test & Katalog İşçisi** | `manifests/`, mock/birim testleri, i18n, dokümantasyon |
 
-- **Kesin Yasak:** `gemini-4` veya yukarıdaki tabloda bulunmayan hiçbir ajan kullanılamaz.
+- **Model eşlemesi:** `claude-sonnet` → Claude Sonnet 5.5, `claude-haiku` → Claude Haiku 5.5, `hydrogen` → Gemini 4 Hydrogen, `neon` → Gemini 4 Neon.
+- **Kesin Yasak:** Yukarıdaki eşlemede bulunmayan hiçbir ajan veya model kullanılamaz. Genel `gemini-4` modelleri yasaktır; yalnızca `hydrogen` ve `neon` rollerine atanan Gemini 4 Hydrogen ve Gemini 4 Neon varyantlarına kullanıcı kararıyla (2026-11-25) izin verilmiştir.
+- **Kapsam istisnası (ADR-0002):** `crates/providers/src/win/probe.rs` ve `crates/providers/src/smbios.rs` dosyaları `hydrogen`'in yetki alanındadır.
 
 ---
 
