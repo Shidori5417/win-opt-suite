@@ -1,0 +1,29 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# Uygulama durumu (asla depoya eklenmez)
+state.db
+state.db-wal
+state.db-shm
+*.db
+*.db-wal
+*.db-shm
+
+# Ortam / gizli bilgiler
+.env
+.env.*
+!.env.example
+
+# Frontend
+node_modules/
+apps/desktop/dist/
+apps/desktop/src-tauri/target/
+apps/desktop/src-tauri/gen/
+
+# Editör / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
