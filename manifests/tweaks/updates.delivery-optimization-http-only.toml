@@ -1,0 +1,18 @@
+schema_version = 1
+id = "updates.delivery-optimization-http-only"
+title = "Delivery Optimization: HTTP only"
+description = "Sets DODownloadMode to 0 so updates are downloaded only from Microsoft, without peer-to-peer sharing."
+category = "network"
+risk = "low"
+side_effects = "Peer-to-peer sharing is disabled and updates download only from Microsoft over HTTP. Downloads may be slower and use more bandwidth."
+min_windows_build = 22000
+excluded_on = ["domain_joined"]
+conflicts_with = ["updates.delivery-optimization-lan-only"]
+references = ["https://learn.microsoft.com/windows/deployment/do/waas-delivery-optimization-reference"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization'
+value_name = "DODownloadMode"
+value = { type = "dword", data = 0 }

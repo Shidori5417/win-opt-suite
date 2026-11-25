@@ -1,0 +1,20 @@
+schema_version = 1
+id = "privacy.disable-ceip-tasks"
+title = "Disable Customer Experience Improvement Program tasks"
+description = "Disables the scheduled tasks that collect data for the Customer Experience Improvement Program."
+category = "telemetry"
+risk = "low"
+side_effects = "The CEIP data collection tasks no longer run. No user-visible functionality is affected."
+min_windows_build = 22000
+profiles = ["privacy"]
+references = ["https://learn.microsoft.com/windows/privacy/configure-windows-diagnostic-data-in-your-organization"]
+
+[[actions]]
+provider = "scheduled_task"
+path = '\Microsoft\Windows\Customer Experience Improvement Program\Consolidator'
+enabled = false
+
+[[actions]]
+provider = "scheduled_task"
+path = '\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip'
+enabled = false

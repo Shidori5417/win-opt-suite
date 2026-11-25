@@ -1,0 +1,18 @@
+schema_version = 1
+id = "updates.no-auto-reboot-logged-on"
+title = "No automatic restart while a user is signed in"
+description = "Sets NoAutoRebootWithLoggedOnUsers so Windows Update does not restart the PC automatically while someone is signed in."
+category = "updates"
+risk = "low"
+side_effects = "Updates may wait longer to finish installing, because a restart needs a manual action while a user is signed in."
+min_windows_build = 22000
+excluded_on = ["domain_joined"]
+profiles = ["safe"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-windowsupdate#noautorebootwithloggedonusers"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU'
+value_name = "NoAutoRebootWithLoggedOnUsers"
+value = { type = "dword", data = 1 }

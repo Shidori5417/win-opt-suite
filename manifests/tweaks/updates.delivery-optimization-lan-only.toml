@@ -1,0 +1,19 @@
+schema_version = 1
+id = "updates.delivery-optimization-lan-only"
+title = "Delivery Optimization: local network only"
+description = "Sets DODownloadMode to 1 so update and app downloads are shared only with PCs on the local network."
+category = "network"
+risk = "low"
+side_effects = "Update and app downloads are shared only with PCs on the same local network. Downloads may be slower when no local peers exist."
+min_windows_build = 22000
+excluded_on = ["domain_joined"]
+conflicts_with = ["updates.delivery-optimization-http-only"]
+profiles = ["privacy"]
+references = ["https://learn.microsoft.com/windows/deployment/do/waas-delivery-optimization-reference"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization'
+value_name = "DODownloadMode"
+value = { type = "dword", data = 1 }

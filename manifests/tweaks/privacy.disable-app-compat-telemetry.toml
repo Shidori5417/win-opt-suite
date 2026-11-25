@@ -1,0 +1,22 @@
+schema_version = 1
+id = "privacy.disable-app-compat-telemetry"
+title = "Disable application compatibility telemetry"
+description = "Sets the AITEnable policy to 0 and disables the Microsoft Compatibility Appraiser scheduled task."
+category = "telemetry"
+risk = "low"
+side_effects = "Telemetry from the Application Compatibility Appraiser stops. Upgrade-compatibility checks may be less accurate."
+min_windows_build = 22000
+profiles = ["privacy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-appcompat#aitenable"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\AppCompat'
+value_name = "AITEnable"
+value = { type = "dword", data = 0 }
+
+[[actions]]
+provider = "scheduled_task"
+path = '\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser'
+enabled = false
