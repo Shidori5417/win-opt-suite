@@ -13,11 +13,20 @@
 #![forbid(unsafe_code)]
 
 pub mod clock;
+pub mod conflict;
 pub mod lock;
+pub mod manager;
+pub mod planner;
 pub mod registry;
 pub mod store;
 
+#[cfg(test)]
+mod testing;
+
 pub use clock::{Clock, IdGenerator, SystemClock, UuidV7Generator};
+pub use conflict::ConflictGuard;
 pub use lock::{FileLock, LockGuard, TransactionLock};
+pub use manager::TransactionManager;
+pub use planner::DryRunPlanner;
 pub use registry::ProviderRegistry;
 pub use store::Store;
