@@ -22,6 +22,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if target_os == "windows" && target_env == "msvc" {
         let manifest = Path::new(env!("CARGO_MANIFEST_DIR")).join(WINDOWS_APP_MANIFEST);
         println!("cargo:rerun-if-changed={}", manifest.display());
+        // The linker would otherwise add its own asInvoker UAC fragment,
+        // which conflicts with our requestedExecutionLevel.
+        println!("cargo:rustc-link-arg=/MANIFESTUAC:NO");
         println!("cargo:rustc-link-arg=/MANIFEST:EMBED");
         println!("cargo:rustc-link-arg=/MANIFESTINPUT:{}", manifest.display());
         // Turn linker warnings (e.g. duplicate manifests) into errors.
