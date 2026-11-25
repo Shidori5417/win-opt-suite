@@ -1,0 +1,15 @@
+schema_version = 1
+id = "privacy.disable-diagtrack-service"
+title = "Disable DiagTrack service"
+description = "Sets the DiagTrack (Connected User Experiences and Telemetry) service start type to disabled."
+category = "telemetry"
+risk = "medium"
+side_effects = "Connected User Experiences and Telemetry stops; some diagnostics settings in Windows Settings show as managed by your organization."
+min_windows_build = 22000
+profiles = ["privacy"]
+references = ["https://learn.microsoft.com/windows/privacy/manage-connections-from-windows-operating-system-components-to-microsoft-services"]
+
+[[actions]]
+provider = "service"
+name = "DiagTrack"
+start_type = "disabled"

@@ -1,0 +1,17 @@
+schema_version = 1
+id = "privacy.disable-error-reporting"
+title = "Disable Windows Error Reporting"
+description = "Disables Windows Error Reporting through the Disabled policy so crash reports are not sent to Microsoft."
+category = "privacy"
+risk = "medium"
+side_effects = "Crash reports are not sent to Microsoft, so Microsoft cannot offer solutions for application crashes."
+min_windows_build = 22000
+profiles = ["privacy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-windowserrorreporting"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting'
+value_name = "Disabled"
+value = { type = "dword", data = 1 }

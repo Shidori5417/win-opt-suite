@@ -1,0 +1,31 @@
+schema_version = 1
+id = "privacy.disable-activity-history"
+title = "Disable activity history"
+description = "Disables the Timeline activity feed and the publishing and uploading of user activities through policy."
+category = "privacy"
+risk = "low"
+side_effects = "Timeline and cross-device activity history are no longer collected or synced, and earlier activities are no longer offered in Task View."
+min_windows_build = 22000
+profiles = ["safe", "privacy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-system"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\System'
+value_name = "EnableActivityFeed"
+value = { type = "dword", data = 0 }
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\System'
+value_name = "PublishUserActivities"
+value = { type = "dword", data = 0 }
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Windows\System'
+value_name = "UploadUserActivities"
+value = { type = "dword", data = 0 }

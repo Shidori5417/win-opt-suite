@@ -1,0 +1,19 @@
+schema_version = 1
+id = "power.usb-selective-suspend-off-on-ac"
+title = "Disable USB selective suspend on AC power"
+description = "Sets USB selective suspend to disabled on AC power and keeps it disabled on battery, in the active power plan."
+category = "power"
+risk = "low"
+side_effects = "Slightly higher idle power use on AC. Battery behaviour is unchanged."
+min_windows_build = 22000
+excluded_on = ["virtual_machine"]
+profiles = ["gaming"]
+references = ["https://learn.microsoft.com/windows-server/administration/windows-commands/powercfg"]
+
+[[actions]]
+provider = "power_plan"
+op = "set_value"
+subgroup_guid = "2a737441-1930-4402-8d77-b2bebba308a3"
+setting_guid = "48e6b7a6-50f5-4782-a5d4-53bb8f07e226"
+ac_value = 0
+dc_value = 1

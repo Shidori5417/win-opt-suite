@@ -1,0 +1,17 @@
+schema_version = 1
+id = "interface.disable-search-web-suggestions"
+title = "Disable web suggestions in search"
+description = "Sets DisableSearchBoxSuggestions so the Start and taskbar search box does not show web results."
+category = "interface"
+risk = "low"
+side_effects = "Start and taskbar search no longer shows Bing web results. It also hides recent search entries in File Explorer."
+min_windows_build = 22000
+profiles = ["safe", "privacy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-search#disablesearchboxsuggestions"]
+
+[[actions]]
+provider = "registry"
+hive = "HKCU"
+key = 'Software\Policies\Microsoft\Windows\Explorer'
+value_name = "DisableSearchBoxSuggestions"
+value = { type = "dword", data = 1 }

@@ -1,0 +1,17 @@
+schema_version = 1
+id = "privacy.disable-tailored-experiences"
+title = "Disable tailored experiences"
+description = "Stops Windows from using diagnostic data to offer tailored tips, ads and recommendations to the current user."
+category = "privacy"
+risk = "low"
+side_effects = "Tips, suggestions and recommendations based on diagnostic data are no longer shown in Windows experiences."
+min_windows_build = 22000
+profiles = ["safe", "privacy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-cloudcontent#disabletailoredexperienceswithdiagnosticdata"]
+
+[[actions]]
+provider = "registry"
+hive = "HKCU"
+key = 'Software\Policies\Microsoft\Windows\CloudContent'
+value_name = "DisableTailoredExperiencesWithDiagnosticData"
+value = { type = "dword", data = 1 }

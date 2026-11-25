@@ -1,0 +1,366 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:winopt:tweak-manifest:v1",
+  "title": "TweakManifest",
+  "description": "Declarative tweak manifest (manifests/tweaks/<id>.toml). Mirrors shared_types::TweakManifest; Rust-only rules (file name == id, max_windows_build >= min_windows_build, conflicts_with targets exist, duplicate resources, Defender/placebo denylist) are enforced by core-engine tests and the catalog loader.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "title",
+    "description",
+    "category",
+    "risk",
+    "side_effects",
+    "min_windows_build",
+    "actions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "Manifest schema version. Only 1 is understood by this build."
+    },
+    "id": {
+      "$ref": "#/$defs/tweakId"
+    },
+    "title": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "Short human-readable name."
+    },
+    "description": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "What the tweak does."
+    },
+    "category": {
+      "enum": [
+        "privacy",
+        "telemetry",
+        "performance",
+        "gaming",
+        "power",
+        "network",
+        "interface",
+        "services",
+        "updates",
+        "security"
+      ]
+    },
+    "risk": {
+      "enum": ["low", "medium", "high"]
+    },
+    "side_effects": {
+      "type": "string",
+      "pattern": "\\S",
+      "description": "Mandatory, honest description of user-visible side effects."
+    },
+    "min_windows_build": {
+      "type": "integer",
+      "minimum": 22000,
+      "description": "First Windows build this tweak applies to (Windows 11 21H2 = 22000)."
+    },
+    "max_windows_build": {
+      "type": "integer",
+      "minimum": 22000,
+      "description": "Last Windows build this tweak applies to. Must be >= min_windows_build (checked by Rust)."
+    },
+    "excluded_on": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/environmentTag"
+      }
+    },
+    "conflicts_with": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/tweakId"
+      }
+    },
+    "profiles": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": ["safe", "privacy", "gaming", "laptop"]
+      }
+    },
+    "requires_reboot": {
+      "type": "boolean"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^https://"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/action"
+      }
+    }
+  },
+  "$defs": {
+    "tweakId": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+([.-][a-z0-9]+)*$"
+    },
+    "environmentTag": {
+      "enum": [
+        "laptop",
+        "desktop",
+        "on_battery",
+        "virtual_machine",
+        "domain_joined",
+        "anti_cheat_vanguard",
+        "anti_cheat_faceit",
+        "anti_cheat_easy_anti_cheat",
+        "anti_cheat_battl_eye"
+      ]
+    },
+    "guid": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+    },
+    "u32": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4294967295
+    },
+    "action": {
+      "description": "One atomic change, discriminated by `provider`.",
+      "oneOf": [
+        { "$ref": "#/$defs/registryAction" },
+        { "$ref": "#/$defs/serviceAction" },
+        { "$ref": "#/$defs/scheduledTaskAction" },
+        { "$ref": "#/$defs/powerPlanAction" },
+        { "$ref": "#/$defs/firewallAction" }
+      ]
+    },
+    "registryAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "hive", "key", "value_name"],
+      "properties": {
+        "provider": { "const": "registry" },
+        "hive": { "enum": ["HKLM", "HKCU"] },
+        "key": {
+          "type": "string",
+          "pattern": "\\S",
+          "description": "Key path below the hive, without leading/trailing backslash."
+        },
+        "value_name": {
+          "type": "string",
+          "description": "Value name; empty string addresses the default value."
+        },
+        "value": { "$ref": "#/$defs/registryValue" },
+        "delete": {
+          "type": "boolean",
+          "description": "Delete the value instead of setting it. Exactly one of `value` or `delete = true` is required."
+        }
+      },
+      "oneOf": [
+        { "required": ["value"] },
+        {
+          "required": ["delete"],
+          "properties": { "delete": { "const": true } }
+        }
+      ]
+    },
+    "registryValue": {
+      "description": "Typed registry value, serialized as { type, data }.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "data"],
+          "properties": {
+            "type": { "const": "dword" },
+            "data": { "$ref": "#/$defs/u32" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "data"],
+          "properties": {
+            "type": { "const": "qword" },
+            "data": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 18446744073709551615
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "data"],
+          "properties": {
+            "type": { "const": "string" },
+            "data": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "data"],
+          "properties": {
+            "type": { "const": "expand_string" },
+            "data": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "data"],
+          "properties": {
+            "type": { "const": "multi_string" },
+            "data": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "data"],
+          "properties": {
+            "type": { "const": "binary" },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 255
+              }
+            }
+          }
+        }
+      ]
+    },
+    "serviceAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "name", "start_type"],
+      "properties": {
+        "provider": { "const": "service" },
+        "name": {
+          "type": "string",
+          "pattern": "\\S",
+          "description": "Service key name (not the display name), e.g. DiagTrack."
+        },
+        "start_type": {
+          "enum": ["automatic", "automatic_delayed", "manual", "disabled"]
+        }
+      }
+    },
+    "scheduledTaskAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "path", "enabled"],
+      "properties": {
+        "provider": { "const": "scheduled_task" },
+        "path": {
+          "type": "string",
+          "pattern": "\\S",
+          "description": "Full task path, e.g. \\Microsoft\\Windows\\..."
+        },
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "powerPlanAction": {
+      "description": "Power plan change, discriminated by `op`.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "op", "scheme_guid"],
+          "properties": {
+            "provider": { "const": "power_plan" },
+            "op": { "const": "activate_scheme" },
+            "scheme_guid": { "$ref": "#/$defs/guid" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "provider",
+            "op",
+            "subgroup_guid",
+            "setting_guid",
+            "ac_value",
+            "dc_value"
+          ],
+          "properties": {
+            "provider": { "const": "power_plan" },
+            "op": { "const": "set_value" },
+            "scheme_guid": {
+              "$ref": "#/$defs/guid",
+              "description": "Omit to target the currently active scheme."
+            },
+            "subgroup_guid": { "$ref": "#/$defs/guid" },
+            "setting_guid": { "$ref": "#/$defs/guid" },
+            "ac_value": { "$ref": "#/$defs/u32" },
+            "dc_value": { "$ref": "#/$defs/u32" }
+          }
+        }
+      ]
+    },
+    "firewallAction": {
+      "description": "Windows Firewall change, discriminated by `op`.",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "op", "rule_name", "enabled"],
+          "properties": {
+            "provider": { "const": "firewall" },
+            "op": { "const": "set_rule_enabled" },
+            "rule_name": {
+              "type": "string",
+              "pattern": "\\S"
+            },
+            "enabled": { "type": "boolean" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["provider", "op", "rule"],
+          "properties": {
+            "provider": { "const": "firewall" },
+            "op": { "const": "ensure_rule" },
+            "rule": { "$ref": "#/$defs/firewallRule" }
+          }
+        }
+      ]
+    },
+    "firewallRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "direction", "action", "enabled"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "\\S",
+          "description": "Unique rule name; app-owned rules use the WinOptSuite- prefix."
+        },
+        "direction": { "enum": ["inbound", "outbound"] },
+        "action": { "enum": ["allow", "block"] },
+        "program": { "type": "string" },
+        "remote_addresses": { "type": "string" },
+        "enabled": { "type": "boolean" }
+      }
+    }
+  }
+}

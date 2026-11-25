@@ -1,0 +1,18 @@
+schema_version = 1
+id = "power.no-wake-timers-on-battery"
+title = "No wake timers on battery"
+description = "Disables wake timers on battery power in the active power plan and keeps them enabled on AC power."
+category = "power"
+risk = "low"
+side_effects = "Scheduled maintenance will not wake the PC while it runs on battery."
+min_windows_build = 22000
+profiles = ["laptop", "safe"]
+references = ["https://learn.microsoft.com/windows-server/administration/windows-commands/powercfg"]
+
+[[actions]]
+provider = "power_plan"
+op = "set_value"
+subgroup_guid = "238c9fa8-0aad-41ed-83f4-97be242c8f20"
+setting_guid = "bd3b718a-0680-4d9d-8ab2-e1d2b4ac806d"
+ac_value = 1
+dc_value = 0

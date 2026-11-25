@@ -1,0 +1,17 @@
+schema_version = 1
+id = "interface.disable-widgets"
+title = "Disable Widgets"
+description = "Sets the AllowNewsAndInterests policy to 0 so the Widgets board is turned off."
+category = "interface"
+risk = "low"
+side_effects = "The Widgets board and its taskbar entry are disabled for all users of this PC."
+min_windows_build = 22000
+profiles = ["safe"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-newsandinterests#allownewsandinterests"]
+
+[[actions]]
+provider = "registry"
+hive = "HKLM"
+key = 'SOFTWARE\Policies\Microsoft\Dsh'
+value_name = "AllowNewsAndInterests"
+value = { type = "dword", data = 0 }
