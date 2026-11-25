@@ -28,13 +28,11 @@ impl ProviderRegistry {
     /// Registers `provider` under its [`SystemProvider::kind`].
     ///
     /// # Errors
-    /// [`AppError::Internal`] if a provider of the same kind is already registered.
+    /// [`AppError::DuplicateProvider`] if a provider of the same kind is already registered.
     pub fn register(&mut self, provider: Box<dyn SystemProvider>) -> AppResult<()> {
         let kind = provider.kind();
         if self.providers.contains_key(&kind) {
-            return Err(AppError::Internal {
-                message: format!("provider `{kind}` is already registered"),
-            });
+            return Err(AppError::DuplicateProvider { provider: kind });
         }
         self.providers.insert(kind, provider);
         Ok(())

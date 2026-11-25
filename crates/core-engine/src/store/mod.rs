@@ -190,6 +190,12 @@ impl Store {
         f(&guard).map_err(AppError::from)
     }
 
+    /// Current schema version (`PRAGMA user_version`), i.e. the number of the
+    /// latest applied migration.
+    pub fn schema_version(&self) -> AppResult<u32> {
+        self.with_conn(|c| Ok(c.query_row("PRAGMA user_version", [], |r| r.get::<_, u32>(0))?))
+    }
+
     // ------------------------------------------------------- transactions --
 
     /// Inserts a new transaction row.
@@ -556,6 +562,13 @@ mod tests {
     use shared_types::{RegistryAction, RegistryHive, RegistryValue, ResourceState};
 
     use super::*;
+
+    #[test]
+    fn schema_version_matches_latest_migration() {
+        let store = Store::open_in_memory().unwrap();
+        let latest = migrations::MIGRATIONS.iter().map(|m| m.version).max();
+        assert_eq!(Some(store.schema_version().unwrap()), latest);
+    }
 
     fn action() -> ActionSpec {
         ActionSpec::Registry(RegistryAction {

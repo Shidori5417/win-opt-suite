@@ -1,13 +1,14 @@
 //! `TransactionManager`: saga-style apply with durable per-step snapshots,
 //! reverse-order rollback and startup crash recovery (ADR-0001 §3).
 
+use std::collections::BTreeSet;
+
 use shared_types::{
-    ActionSpec, AppError, AppResult, Profile, StepStatus, SystemFacts, TransactionId,
-    TransactionStatus, TransactionSummary, TweakId, TweakManifest, VerifyOutcome,
+    ActionSpec, AppError, AppResult, Profile, ResourceId, StepStatus, SystemFacts, TransactionId,
+    TransactionLock, TransactionStatus, TransactionSummary, TweakId, TweakManifest, VerifyOutcome,
 };
 
 use crate::clock::{Clock, IdGenerator, SystemClock, UuidV7Generator};
-use crate::lock::TransactionLock;
 use crate::planner::{DryRunPlanner, flatten_actions, has_blocking, validate_selection};
 use crate::registry::ProviderRegistry;
 use crate::store::{NewStep, NewTransaction, StepRecord, Store};
@@ -138,20 +139,21 @@ impl TransactionManager {
     /// Rolls a `COMMITTED` transaction back (reverse step order).
     ///
     /// # Errors
-    /// `LockUnavailable`, `RecoveryRequired`, `NotFound`, `Internal` when the
-    /// transaction is not `COMMITTED`, or `RollbackIncomplete`.
+    /// `LockUnavailable`, `RecoveryRequired`, `NotFound`, `InvalidTransactionState` when the
+    /// transaction is not `COMMITTED`, `RollbackSuperseded` when a newer
+    /// committed transaction changed the same resources, or
+    /// `RollbackIncomplete`.
     pub fn rollback(&self, transaction_id: &TransactionId) -> AppResult<()> {
         let _guard = self.lock.acquire()?;
         self.ensure_no_incomplete()?;
         let record = self.load(transaction_id)?;
         if record.status != TransactionStatus::Committed {
-            return Err(AppError::Internal {
-                message: format!(
-                    "transaction {transaction_id} is {}; only COMMITTED transactions can be rolled back",
-                    record.status
-                ),
+            return Err(AppError::InvalidTransactionState {
+                transaction_id: transaction_id.to_string(),
+                status: record.status,
             });
         }
+        self.ensure_not_superseded(transaction_id)?;
         self.set_status(transaction_id, TransactionStatus::RollingBack, None)?;
         self.revert_transaction(transaction_id, None)
     }
@@ -169,17 +171,15 @@ impl TransactionManager {
     /// skipping steps already `REVERTED`. Returns the final status.
     ///
     /// # Errors
-    /// `LockUnavailable`, `NotFound`, `Internal` when the transaction needs no
+    /// `LockUnavailable`, `NotFound`, `InvalidTransactionState` when the transaction needs no
     /// recovery, or `RollbackIncomplete` when a revert failed again.
     pub fn recover(&self, transaction_id: &TransactionId) -> AppResult<TransactionStatus> {
         let _guard = self.lock.acquire()?;
         let record = self.load(transaction_id)?;
         if !record.status.is_incomplete() && record.status != TransactionStatus::Failed {
-            return Err(AppError::Internal {
-                message: format!(
-                    "transaction {transaction_id} is {}; nothing to recover",
-                    record.status
-                ),
+            return Err(AppError::InvalidTransactionState {
+                transaction_id: transaction_id.to_string(),
+                status: record.status,
             });
         }
         self.set_status(transaction_id, TransactionStatus::RollingBack, None)?;
@@ -200,6 +200,48 @@ impl TransactionManager {
             .ok_or_else(|| AppError::NotFound {
                 resource: format!("transaction {id}"),
             })
+    }
+
+    /// ADR-0004: refuses to roll back `target` when a newer `COMMITTED`
+    /// transaction also changed one of its `APPLIED` resources (LIFO order).
+    fn ensure_not_superseded(&self, target: &TransactionId) -> AppResult<()> {
+        let mine: BTreeSet<ResourceId> = self
+            .store
+            .steps(target)?
+            .into_iter()
+            .filter(|s| s.status == StepStatus::Applied)
+            .map(|s| s.resource)
+            .collect();
+        if mine.is_empty() {
+            return Ok(());
+        }
+        // `summaries()` is newest first; ids are time-ordered, but rely on
+        // the store ordering and stop at the target.
+        for tx in self.store.summaries()? {
+            if tx.id == *target {
+                break;
+            }
+            if tx.status != TransactionStatus::Committed {
+                continue;
+            }
+            let mut overlap: Vec<String> = self
+                .store
+                .steps(&tx.id)?
+                .into_iter()
+                .filter(|s| s.status == StepStatus::Applied && mine.contains(&s.resource))
+                .map(|s| s.resource.to_string())
+                .collect();
+            if !overlap.is_empty() {
+                overlap.sort();
+                overlap.dedup();
+                return Err(AppError::RollbackSuperseded {
+                    transaction_id: target.to_string(),
+                    newer_transaction_id: tx.id.to_string(),
+                    resources: overlap,
+                });
+            }
+        }
+        Ok(())
     }
 
     fn ensure_no_incomplete(&self) -> AppResult<()> {
@@ -538,12 +580,85 @@ mod tests {
         // cannot roll back twice / unknown id
         assert!(matches!(
             fx.mgr.rollback(&id),
-            Err(AppError::Internal { .. })
+            Err(AppError::InvalidTransactionState { .. })
         ));
         assert!(matches!(
             fx.mgr.rollback(&TransactionId::new("nope")),
             Err(AppError::NotFound { .. })
         ));
+    }
+
+    #[test]
+    fn rollback_of_superseded_transaction_is_refused_until_newer_is_rolled_back() {
+        let fx = fx();
+        let old = fx
+            .mgr
+            .apply(
+                &[manifest("tweak.a", vec![reg("A", 1), reg("B", 1)])],
+                None,
+                &facts(),
+            )
+            .unwrap();
+        let new = fx
+            .mgr
+            .apply(
+                &[manifest("tweak.b", vec![reg("A", 2), reg("C", 1)])],
+                None,
+                &facts(),
+            )
+            .unwrap();
+        fx.provider.with(|i| i.log.clear());
+        assert_eq!(
+            fx.mgr.rollback(&old).unwrap_err(),
+            AppError::RollbackSuperseded {
+                transaction_id: old.to_string(),
+                newer_transaction_id: new.to_string(),
+                resources: vec![reg("A", 0).resource_id().to_string()],
+            }
+        );
+        assert!(
+            fx.provider.log().is_empty(),
+            "refusal must not touch system"
+        );
+        assert_eq!(tx_status(&fx, &old), TransactionStatus::Committed);
+
+        // LIFO order is allowed.
+        fx.mgr.rollback(&new).unwrap();
+        fx.mgr.rollback(&old).unwrap();
+        assert_eq!(tx_status(&fx, &old), TransactionStatus::RolledBack);
+        assert_eq!(fx.provider.get(&reg("A", 0)), None);
+    }
+
+    #[test]
+    fn rollback_of_newer_or_disjoint_transaction_is_allowed() {
+        let fx = fx();
+        let old = fx
+            .mgr
+            .apply(&[manifest("tweak.a", vec![reg("A", 1)])], None, &facts())
+            .unwrap();
+        let new = fx
+            .mgr
+            .apply(&[manifest("tweak.b", vec![reg("B", 1)])], None, &facts())
+            .unwrap();
+        // Disjoint resources: the older one may be rolled back first.
+        fx.mgr.rollback(&old).unwrap();
+        fx.mgr.rollback(&new).unwrap();
+    }
+
+    #[test]
+    fn duplicate_provider_registration_is_typed() {
+        let mut registry = ProviderRegistry::new();
+        registry
+            .register(Box::new(FakeProvider::default()))
+            .unwrap();
+        assert_eq!(
+            registry
+                .register(Box::new(FakeProvider::default()))
+                .unwrap_err(),
+            AppError::DuplicateProvider {
+                provider: ProviderKind::Registry
+            }
+        );
     }
 
     /// Leaves the DB as a crash would: tx APPLYING, steps 0-1 APPLIED, step 2

@@ -210,7 +210,10 @@ fn user_rollback_of_non_committed_transaction_is_refused() {
     provider.clear_faults();
     provider.clear_log();
     for id in [&rolled_back, &failed] {
-        assert!(matches!(mgr.rollback(id), Err(AppError::Internal { .. })));
+        assert!(matches!(
+            mgr.rollback(id),
+            Err(AppError::InvalidTransactionState { .. })
+        ));
     }
     assert!(
         provider.log().is_empty(),
