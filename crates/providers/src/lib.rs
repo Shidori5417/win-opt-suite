@@ -25,6 +25,7 @@ pub mod guid;
 pub mod mapping;
 pub mod paths;
 pub mod reg_codec;
+pub mod smbios;
 
 #[cfg(windows)]
 mod win;
