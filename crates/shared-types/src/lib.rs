@@ -15,6 +15,7 @@ pub mod diff;
 pub mod drift;
 pub mod error;
 pub mod ids;
+pub mod lock;
 pub mod manifest;
 pub mod policy;
 pub mod probe;
@@ -33,6 +34,7 @@ pub use diff::{ChangeKind, DiffEntry, DryRunDiff};
 pub use drift::{DriftCheckError, DriftEntry, DriftReport};
 pub use error::{AppError, AppResult};
 pub use ids::{ResourceId, TransactionId, TweakId};
+pub use lock::{LockGuard, TransactionLock};
 pub use manifest::{
     CURRENT_MANIFEST_SCHEMA_VERSION, EnvironmentTag, ManifestIssue, Profile, RiskLevel,
     TweakCategory, TweakManifest, WINDOWS_11_MIN_BUILD,
