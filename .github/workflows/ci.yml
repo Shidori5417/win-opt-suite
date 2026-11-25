@@ -34,6 +34,23 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test
         run: cargo test --workspace
+      - name: opti-cli smoke (read-only)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          DB="$RUNNER_TEMP/state.db"
+          cargo run -q -p cli -- --db "$DB" --manifests manifests/tweaks validate
+          cargo run -q -p cli -- --db "$DB" --manifests manifests/tweaks --json scan
+          # dry-run only reads the system; it never writes.
+          cargo run -q -p cli -- --db "$DB" --manifests manifests/tweaks dry-run --profile safe
+          # CI runners are VMs: gaming tweaks excluded on VMs must be BLOCKED (exit 2).
+          set +e
+          cargo run -q -p cli -- --db "$DB" --manifests manifests/tweaks dry-run --profile gaming
+          rc=$?
+          set -e
+          [ "$rc" -eq 2 ] || { echo "::error::expected exit 2 (blocked on VM), got $rc"; exit 1; }
+          cargo run -q -p cli -- --db "$DB" --manifests manifests/tweaks drift
+          cargo run -q -p cli -- --db "$DB" --manifests manifests/tweaks doctor || echo "::warning::doctor reported failures (server runner)"
 
   policy:
     name: Repository policy
