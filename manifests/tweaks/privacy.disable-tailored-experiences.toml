@@ -7,7 +7,7 @@ risk = "low"
 side_effects = "Tips, suggestions and recommendations based on diagnostic data are no longer shown in Windows experiences."
 min_windows_build = 22000
 profiles = ["safe", "privacy"]
-references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-cloudcontent#disabletailoredexperienceswithdiagnosticdata"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-experience#allowtailoredexperienceswithdiagnosticdata"]
 
 [[actions]]
 provider = "registry"

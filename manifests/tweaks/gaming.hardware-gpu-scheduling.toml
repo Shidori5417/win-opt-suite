@@ -9,7 +9,7 @@ min_windows_build = 22000
 excluded_on = ["virtual_machine"]
 requires_reboot = true
 profiles = ["gaming"]
-references = ["https://learn.microsoft.com/windows-hardware/drivers/display/hardware-accelerated-gpu-scheduling"]
+references = ["https://devblogs.microsoft.com/directx/hardware-accelerated-gpu-scheduling/"]
 
 [[actions]]
 provider = "registry"

@@ -7,7 +7,7 @@ risk = "low"
 side_effects = "Telemetry from the Application Compatibility Appraiser stops. Upgrade-compatibility checks may be less accurate."
 min_windows_build = 22000
 profiles = ["privacy"]
-references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-appcompat#aitenable"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-appcompat#appcompatturnoffapplicationimpacttelemetry"]
 
 [[actions]]
 provider = "registry"

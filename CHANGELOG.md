@@ -1,6 +1,6 @@
 # Değişiklik Günlüğü
 
-Biçim [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/) ve
+Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) ve
 [Semantic Versioning](https://semver.org/lang/tr/) esas alınır.
 
 ## [0.1.0] — 2026-11-25

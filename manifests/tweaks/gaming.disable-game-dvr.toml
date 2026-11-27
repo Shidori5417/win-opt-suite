@@ -7,7 +7,7 @@ risk = "low"
 side_effects = "Xbox Game Bar background recording and clip capture are unavailable."
 min_windows_build = 22000
 profiles = ["gaming"]
-references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-gamedvr"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-applicationmanagement#allowgamedvr"]
 
 [[actions]]
 provider = "registry"

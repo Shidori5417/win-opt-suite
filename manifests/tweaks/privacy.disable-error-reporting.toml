@@ -7,7 +7,7 @@ risk = "medium"
 side_effects = "Crash reports are not sent to Microsoft, so Microsoft cannot offer solutions for application crashes."
 min_windows_build = 22000
 profiles = ["privacy"]
-references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-windowserrorreporting"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-errorreporting"]
 
 [[actions]]
 provider = "registry"

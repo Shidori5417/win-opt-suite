@@ -7,7 +7,7 @@ risk = "low"
 side_effects = "Online speech recognition and typing personalization (suggestions learned from your typing) are turned off."
 min_windows_build = 22000
 profiles = ["privacy"]
-references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-inputpersonalization#allowinputpersonalization"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-privacy#allowinputpersonalization"]
 
 [[actions]]
 provider = "registry"
