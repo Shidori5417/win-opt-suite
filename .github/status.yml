@@ -1,0 +1,7 @@
+# Read by github.com/Shidori5417 (profile README) and the portfolio site.
+# Edit when the project's state changes; no need to touch it otherwise.
+# status: active | prototype | released | maintenance | paused | archived
+status: released
+focus:
+  en: "v0.1.0 is out: native Windows 11 optimisation with atomic rollback (Rust + Tauri v2)."
+  tr: "v0.1.0 yayında: atomik geri alma destekli native Windows 11 optimizasyonu (Rust + Tauri v2)."
