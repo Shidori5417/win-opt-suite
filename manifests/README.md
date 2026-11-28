@@ -2,8 +2,8 @@
 
 Bu dizin uygulamanın tüm optimizasyonlarını bildirimsel olarak tanımlar.
 Her tweak tek bir dosyadır: `manifests/tweaks/<id>.toml`. Dosya adı, dosyadaki
-`id` alanıyla birebir aynı olmalıdır (ör. `privacy.disable-widgets` →
-`privacy.disable-widgets.toml`).
+`id` alanıyla birebir aynı olmalıdır (ör. `interface.disable-widgets` →
+`interface.disable-widgets.toml`).
 
 Şema: `manifests/schema.json` (JSON Schema draft 2020-12). Rust tarafındaki
 karşılığı `crates/shared-types/src/manifest.rs` ve `action.rs` dosyalarıdır.

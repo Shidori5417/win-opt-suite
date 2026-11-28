@@ -7,7 +7,7 @@ risk = "low"
 side_effects = "Apps that use the advertising ID for personalized ads or cross-app tracking can no longer read it. Ads become less tailored."
 min_windows_build = 22000
 profiles = ["safe", "privacy"]
-references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-advertisinginfo#disabledbygrouppolicy"]
+references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-privacy#disableadvertisingid"]
 
 [[actions]]
 provider = "registry"

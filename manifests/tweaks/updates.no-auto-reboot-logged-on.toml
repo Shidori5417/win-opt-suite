@@ -8,7 +8,7 @@ side_effects = "Updates may wait longer to finish installing, because a restart 
 min_windows_build = 22000
 excluded_on = ["domain_joined"]
 profiles = ["safe"]
-references = ["https://learn.microsoft.com/windows/client-management/mdm/policy-csp-admx-windowsupdate#noautorebootwithloggedonusers"]
+references = ["https://learn.microsoft.com/windows/deployment/update/waas-wu-settings"]
 
 [[actions]]
 provider = "registry"

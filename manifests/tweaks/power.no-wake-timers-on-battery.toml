@@ -7,7 +7,7 @@ risk = "low"
 side_effects = "Scheduled maintenance will not wake the PC while it runs on battery."
 min_windows_build = 22000
 profiles = ["laptop", "safe"]
-references = ["https://learn.microsoft.com/windows-server/administration/windows-commands/powercfg"]
+references = ["https://learn.microsoft.com/windows-hardware/design/device-experiences/powercfg-command-line-options"]
 
 [[actions]]
 provider = "power_plan"
